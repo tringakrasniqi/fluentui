@@ -2,33 +2,180 @@
 
 ## Background
 
-_Description and use cases of this component_
+A Dialog is an elevated Card triggered by a user’s action.
 
 ## Prior Art
 
-_Include background research done for this component_
+- All mentions of v7 or v8 refer to Fabric - `@fluentui/react` ([docsite](https://developer.microsoft.com/en-us/fluentui#/))
+- All mentions of v0 refer to Northstar - `@fluentui/react-northstar` ([docsite](https://fluentsite.z22.web.core.windows.net/))
 
-- _Link to Open UI research_
-- _Link to comparison of v7 and v0_
-- _Link to GitHub epic issue for the converged component_
+- [Github epic](https://github.com/microsoft/fluentui/issues/20953)
+- [Open UI Research](https://open-ui.org/components/dialog.research)
+- Dialogs in 3rd party UI systems:
+  - [Carbon](https://react.carbondesignsystem.com/?path=/docs/components-modal--default)
+  - [Chakra UI](https://chakra-ui.com/docs/overlay/modal)
+  - [FAST](https://explore.fast.design/components/fast-dialog)
+  - [Material UI](https://mui.com/components/dialogs/)
+  - [Radix](https://www.radix-ui.com/docs/primitives/components/dialog)
+  - [Reach UI](https://reach.tech/dialog/)
+  - [Reakit](https://reakit.io/docs/dialog/)
+    - [Ariakit](https://github.com/reakit/reakit/tree/v2)
+  - [Spectrum](https://react-spectrum.adobe.com/react-spectrum/Dialog.html)
+
+### v8
+
+[Documentation for v8 Dialog](https://developer.microsoft.com/en-us/fluentui#/controls/web/dialog)
+
+```jsx
+  <DefaultButton secondaryText="Opens the Sample Dialog" onClick={toggleHideDialog} text="Open Dialog" />
+
+  <Dialog
+    hidden={hideDialog}
+    onDismiss={toggleHideDialog}
+    dialogContentProps={dialogContentProps}
+    modalProps={modalProps}
+  >
+    <DialogFooter>
+      <PrimaryButton onClick={toggleHideDialog} text="Send" />
+      <DefaultButton onClick={toggleHideDialog} text="Don't send" />
+    </DialogFooter>
+  </Dialog>
+
+```
+
+### v0
+
+[Documentation for v0 Dialog](https://fluentsite.z22.web.core.windows.net/components/dialog/definition)
+
+```jsx
+<Dialog
+  cancelButton="Connect protocol"
+  confirmButton="Transmit capacitor"
+  content="Connect driver"
+  header="Transmit capacitor"
+  headerAction="Generate protocol"
+  trigger={<Button content="A trigger" />}
+/>
+```
 
 ## Sample Code
 
-_Provide some representative example code that uses the proposed API for the component_
+```tsx
+export const MyDialog = () => {
+  const dialogToolkit = useDialogInstance();
+  return (
+    <>
+      <Button
+        appearance="primary"
+        onClick={() => {
+          dialogToolkit.open();
+        }}
+      >
+        {dialogToolkit.isOpen ? 'Close' : 'Open'} Dialog
+      </Button>
+      {/* Some other components if desired. */}
+      <Dialog {...dialogToolkit}>
+        <DialogOverlay />
+        <DialogContent>
+          <DialogHeader>Dialog title</DialogHeader>
+          <DialogBody>Did you ever hear the tragedy of Darth Plagueis The Wise?</DialogBody>
+          <DialogFooter>
+            <Button
+              appearance="outline"
+              onClick={() => {
+                dialogToolkit.close();
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              appearance="primary"
+              onClick={() => {
+                console.log('I thought not. It’s not a story the Jedi would tell you.');
+                dialogToolkit.close();
+              }}
+            >
+              No?
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+};
+```
 
-## Variants
+## Components
 
-_Describe visual or functional variants of this control, if applicable. For example, a slider could have a 2D variant._
+| Component     | Purpose                                                  |
+| ------------- | -------------------------------------------------------- |
+| Dialog        | The main wrapper component.                              |
+| DialogOverlay | (optional) Overlay of dialog.                            |
+| DialogContent | Wrapper of for the content components.                   |
+| DialogHeader  | (optional) Component for the title and the close button. |
+| DialogBody    | (optional) Component for the main content of dialog.     |
+| DialogFooter  | (optional) Component for the main actions of dialog.     |
 
 ## API
 
-_List the **Props** and **Slots** proposed for the component. Ideally this would just be a link to the component's `.types.ts` file_
+[Dialog.types.ts](https://github.com/microsoft/fluentui/blob/master/packages/react-dialog/src/components/Dialog/Dialog.types.ts)
+
+```ts
+export type DialogCommons = {
+  isOpen: boolean;
+  onClose?: Function;
+  onOpen?: Function;
+  shouldAutoFocus?: boolean;
+};
+```
+
+## Anatomy
+
+![Visual anatomy of Dialog component](./assets/dialog-anatomy.png)
 
 ## Structure
 
-- _**Public**_
-- _**Internal**_
-- _**DOM** - how the component will be rendered as HTML elements_
+### App
+
+```tsx
+<Button>Open Dialog</Button>
+
+<Dialog>
+  <DialogOverlay />
+  <DialogContent>
+    <DialogHeader>Dialog title</DialogHeader>
+    <DialogBody>Did you ever hear the tragedy of Darth Plagueis The Wise?</DialogBody>
+    <DialogFooter>
+      <Button>Cancel</Button>
+      <Button>No?<Button>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
+```
+
+### DOM structure
+
+```html
+<button>Open Dialog</button>
+<!-- Something something something -->
+<div class="fui-portal">
+  <div class="fui-dialog-overlay" />
+  <div class="fui-dialog">
+    <header>Dialog title</header>
+    <div>Did you ever hear the tragedy of Darth Plagueis The Wise?</div>
+    <footer>
+      <button>Cancel</button>
+      <button>No?<button>
+    </footer>
+  </div>
+</div>
+```
+
+### useDialogInstance hook
+
+Hook that provides the state management for a dialog.
+
+### non-modal dialog
 
 ## Migration
 
@@ -49,6 +196,25 @@ _Explain how the component will behave in use, including:_
   - _Screen readers_
 
 ## Accessibility
+
+useful links:
+
+- https://www.w3.org/TR/wai-aria-practices/examples/dialog-modal/dialog.html#
+
+Follows the [Dialog WAI-Aria design pattern](https://www.w3.org/TR/wai-aria-practices-1.2/#dialog_modal)
+
+Once the dialog is open, the focus will be trapped within the dialog and the user can either click the overlay to close the dialog or press the escape key to close the dialog. When closed, the focus will be restored to the element that opened the dialog.
+
+Keyboard interaction:
+
+- `Enter`, `Space` - Open/Close the dialog
+- `Tab` - Move focus to first tabbable element in the dialog
+- `Shift + Tab` - Move focus to the previous focusable element in the dialog
+- `Escape` - Closes dialog and focus moves back to the element that opened the dialog
+
+ARIA attributes:
+
+- `role` - `dialog`, `alertdialog`
 
 Base accessibility information is included in the design document. After the spec is filled and review, outcomes from it need to be communicated to design and incorporated in the design document.
 
