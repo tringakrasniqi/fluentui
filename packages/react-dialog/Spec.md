@@ -22,9 +22,19 @@ A Dialog is an elevated Card triggered by a user’s action.
     - [Ariakit](https://github.com/reakit/reakit/tree/v2)
   - [Spectrum](https://react-spectrum.adobe.com/react-spectrum/Dialog.html)
 
-### v8
+### Comparison between v0 and v8
+
+Note that the below code samples are not meant to be complete, but to highlight differences between the two libraries. Please refer to official docsites for actual API references.
+
+#### v8
+
+In v8 there are Dialog and Modal components which are relevant to the Dialog component for v9. The Dialog component was intended to be used primarily for confirming actions, whereas Modal component was intended to be used for lengthy content that may contain forms and other controls. This spec will only cover the comparison to the Dialog component.
+
+The visibility of the dialog is controlled through the `hidden` prop whose its value should be a react state boolean provided from the consumer.
 
 [Documentation for v8 Dialog](https://developer.microsoft.com/en-us/fluentui#/controls/web/dialog)
+
+Sample code:
 
 ```jsx
   <DefaultButton secondaryText="Opens the Sample Dialog" onClick={toggleHideDialog} text="Open Dialog" />
@@ -43,7 +53,9 @@ A Dialog is an elevated Card triggered by a user’s action.
 
 ```
 
-### v0
+#### v0
+
+In v0, the Dialog component expects all the content through props, including the content, actions etc. The dialog component uses the `trigger` prop that expects a React component to control its visibility. The element passed to this prop will be rendered in-place where the dialog is defined.
 
 [Documentation for v0 Dialog](https://fluentsite.z22.web.core.windows.net/components/dialog/definition)
 
@@ -58,7 +70,37 @@ A Dialog is an elevated Card triggered by a user’s action.
 />
 ```
 
-## Sample Code
+## API proposal
+
+### Components
+
+| Component     | Purpose                                                  |
+| ------------- | -------------------------------------------------------- |
+| Dialog        | The main wrapper component.                              |
+| DialogOverlay | (optional) Overlay of dialog.                            |
+| DialogContent | Wrapper of for the content components.                   |
+| DialogHeader  | (optional) Component for the title and the close button. |
+| DialogBody    | (optional) Component for the main content of dialog.     |
+| DialogFooter  | (optional) Component for the main actions of dialog.     |
+
+### Anatomy
+
+![Visual anatomy of Dialog component](./assets/dialog-anatomy.png)
+
+### API
+
+[Dialog.types.ts](https://github.com/microsoft/fluentui/blob/master/packages/react-dialog/src/components/Dialog/Dialog.types.ts)
+
+```ts
+export type DialogCommons = {
+  isOpen: boolean;
+  onClose?: Function;
+  onOpen?: Function;
+  shouldAutoFocus?: boolean;
+};
+```
+
+### Sample Code
 
 ```tsx
 export const MyDialog = () => {
@@ -105,37 +147,9 @@ export const MyDialog = () => {
 };
 ```
 
-## Components
+### Structure
 
-| Component     | Purpose                                                  |
-| ------------- | -------------------------------------------------------- |
-| Dialog        | The main wrapper component.                              |
-| DialogOverlay | (optional) Overlay of dialog.                            |
-| DialogContent | Wrapper of for the content components.                   |
-| DialogHeader  | (optional) Component for the title and the close button. |
-| DialogBody    | (optional) Component for the main content of dialog.     |
-| DialogFooter  | (optional) Component for the main actions of dialog.     |
-
-## API
-
-[Dialog.types.ts](https://github.com/microsoft/fluentui/blob/master/packages/react-dialog/src/components/Dialog/Dialog.types.ts)
-
-```ts
-export type DialogCommons = {
-  isOpen: boolean;
-  onClose?: Function;
-  onOpen?: Function;
-  shouldAutoFocus?: boolean;
-};
-```
-
-## Anatomy
-
-![Visual anatomy of Dialog component](./assets/dialog-anatomy.png)
-
-## Structure
-
-### App
+#### App
 
 ```tsx
 <Button>Open Dialog</Button>
@@ -153,7 +167,7 @@ export type DialogCommons = {
 </Dialog>
 ```
 
-### DOM structure
+#### DOM structure
 
 ```html
 <button>Open Dialog</button>
@@ -171,11 +185,9 @@ export type DialogCommons = {
 </div>
 ```
 
-### useDialogInstance hook
+#### useDialogInstance hook
 
 Hook that provides the state management for a dialog.
-
-### non-modal dialog
 
 ## Migration
 
@@ -186,7 +198,13 @@ _Describe what will need to be done to upgrade from the existing implementations
 
 ## Behaviors
 
-_Explain how the component will behave in use, including:_
+TODO:
+
+- add the modeless dialog behavior
+- add the alert dialog behavior
+- 400% zoom behaviour
+
+  _Explain how the component will behave in use, including:_
 
 - _Component States_
 - _Interaction_
