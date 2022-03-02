@@ -2,7 +2,7 @@
 
 ## Background
 
-A Dialog is an elevated Card triggered by a user’s action.
+A dialog is a window overlaid on top of the page, and it is used to inform users of critical information, require a decision or to complete a task.
 
 ## Prior Art
 
@@ -74,14 +74,14 @@ In v0, the Dialog component expects all the content through props, including the
 
 ### Components
 
-| Component     | Purpose                                                  |
-| ------------- | -------------------------------------------------------- |
-| Dialog        | The main wrapper component.                              |
-| DialogOverlay | (optional) Overlay of dialog.                            |
-| DialogContent | Wrapper of for the content components.                   |
-| DialogHeader  | (optional) Component for the title and the close button. |
-| DialogBody    | (optional) Component for the main content of dialog.     |
-| DialogFooter  | (optional) Component for the main actions of dialog.     |
+| Component    | Purpose                                                  |
+| ------------ | -------------------------------------------------------- |
+| Dialog       | The main wrapper component.                              |
+| DialogHeader | (optional) Component for the title and the close button. |
+| DialogBody   | (optional) Component for the main content of dialog.     |
+| DialogFooter | (optional) Component for the main actions of dialog.     |
+
+## Dialog
 
 ### Anatomy
 
@@ -91,63 +91,45 @@ In v0, the Dialog component expects all the content through props, including the
 
 [Dialog.types.ts](https://github.com/microsoft/fluentui/blob/master/packages/react-dialog/src/components/Dialog/Dialog.types.ts)
 
-```ts
-export type DialogCommons = {
-  isOpen: boolean;
-  onClose?: Function;
-  onOpen?: Function;
-  shouldAutoFocus?: boolean;
-};
-```
+| Property       | Values                        | Default | Purpose                                  |
+| -------------- | ----------------------------- | ------- | ---------------------------------------- |
+| type           | `modal`, `non-modal`, `alert` | `modal` | Dialog variations                        |
+| isOpen         | boolean                       | `false` | Set to `true` when the dialog is visible |
+| overlay (slot) | -                             | -       | Dimmed background of dialog              |
+
+## Dialog Header
+
+- title and close button (Decision needed: close button a slot or a component?)
+
+## Dialog Footer
+
+- Button (primary, secondary, tertiary) order, an issue to be resolved from design.
+
+## Dialog variations - `type` property
+
+- Modal dialog
+
+  When this type of dialog is open, the rest of the page is dimmed out and cannot be interacted with. The tab sequence is kept within the dialog and moving the focus outside the dialog will imply closing it. This is the default type of the component.
+
+  `role="dialog"`
+
+- Non-modal dialog
+
+  When a non-modal dialog is open, the rest of the page is not dimmed out and users can interact with the rest of the page. This also implies that the tab focus can move outside the dialog when it reaches the last focusable element.
+
+  `role="dialog"`
+
+- Alert dialog
+
+  Alert dialog are a special type of modal dialogs that interrupts the user's workflow to communicate an important message or ask for a decision. These dialogs are not dismissable, neither by escape key or by clicking outside the dialog.
+
+  `role="alertdialog"`
 
 ### Sample Code
 
-```tsx
-export const MyDialog = () => {
-  const dialogToolkit = useDialogInstance();
-  return (
-    <>
-      <Button
-        appearance="primary"
-        onClick={() => {
-          dialogToolkit.open();
-        }}
-      >
-        {dialogToolkit.isOpen ? 'Close' : 'Open'} Dialog
-      </Button>
-      {/* Some other components if desired. */}
-      <Dialog {...dialogToolkit}>
-        <DialogOverlay />
-        <DialogContent>
-          <DialogHeader>Dialog title</DialogHeader>
-          <DialogBody>Did you ever hear the tragedy of Darth Plagueis The Wise?</DialogBody>
-          <DialogFooter>
-            <Button
-              appearance="outline"
-              onClick={() => {
-                dialogToolkit.close();
-              }}
-            >
-              Cancel
-            </Button>
-            <Button
-              appearance="primary"
-              onClick={() => {
-                console.log('I thought not. It’s not a story the Jedi would tell you.');
-                dialogToolkit.close();
-              }}
-            >
-              No?
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </>
-  );
-};
-```
-
 ### Structure
+
+TBA
 
 #### App
 
@@ -155,15 +137,12 @@ export const MyDialog = () => {
 <Button>Open Dialog</Button>
 
 <Dialog>
-  <DialogOverlay />
-  <DialogContent>
-    <DialogHeader>Dialog title</DialogHeader>
-    <DialogBody>Did you ever hear the tragedy of Darth Plagueis The Wise?</DialogBody>
-    <DialogFooter>
-      <Button>Cancel</Button>
-      <Button>No?<Button>
-    </DialogFooter>
-  </DialogContent>
+  <DialogHeader>Missing Subject</DialogHeader>
+  <DialogBody>Do you want to send this message without a subject?</DialogBody>
+  <DialogFooter>
+    <Button>Send</Button>
+    <Button>Cancel<Button>
+  </DialogFooter>
 </Dialog>
 ```
 
@@ -173,13 +152,13 @@ export const MyDialog = () => {
 <button>Open Dialog</button>
 <!-- Something something something -->
 <div class="fui-portal">
-  <div class="fui-dialog-overlay" />
   <div class="fui-dialog">
-    <header>Dialog title</header>
-    <div>Did you ever hear the tragedy of Darth Plagueis The Wise?</div>
-    <footer>
-      <button>Cancel</button>
-      <button>No?<button>
+    <div class="fui-dialog-overlay" />
+    <header class="fui-dialog-header">Missing Subject</header>
+    <div class="fui-dialog-body">Do you want to send this message without a subject?</div>
+    <footer class="fui-dialog-footer">
+      <button>Send</button>
+      <button>Cancel<button>
     </footer>
   </div>
 </div>
