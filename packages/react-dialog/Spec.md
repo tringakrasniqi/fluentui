@@ -91,47 +91,92 @@ In v0, the Dialog component expects all the content through props, including the
 
 [Dialog.types.ts](https://github.com/microsoft/fluentui/blob/master/packages/react-dialog/src/components/Dialog/Dialog.types.ts)
 
-| Property       | Values                        | Default | Purpose                                  |
-| -------------- | ----------------------------- | ------- | ---------------------------------------- |
-| type           | `modal`, `non-modal`, `alert` | `modal` | Dialog variations                        |
-| isOpen         | boolean                       | `false` | Set to `true` when the dialog is visible |
-| overlay (slot) | -                             | -       | Dimmed background of dialog              |
+| Property    | Values                        | Default   | Purpose                                    |
+| ----------- | ----------------------------- | --------- | ------------------------------------------ |
+| type        | `modal`, `non-modal`, `alert` | `modal`   | Dialog variations                          |
+| isOpen      | boolean                       | `false`   | Set to `true` when the dialog is visible   |
+| isDraggable | boolean                       | `false`   | Set to `true` to make the dialog draggable |
+| overlay     | _slot_                        | undefined | Dimmed background of dialog                |
+
+### DOM
+
+```html
+<div role="dialog" class="fui-dialog">{children}</div>
+```
 
 ## Dialog Header
 
-- title and close button (Decision needed: close button a slot or a component?)
+### Anatomy
+
+![Visual anatomy of Dialog component](./assets/dialog-header.png)
+⚠️ Image subject to change!
+
+### DOM
+
+```html
+<div class="fui-dialog-header">
+  <span>{title}</span>
+  <button aria-label="close" />
+</div>
+```
+
+### API
+
+| Property    | Values | Default   | Purpose       |
+| ----------- | ------ | --------- | ------------- |
+| header      | _slot_ | undefined | Dialog header |
+| closeButton | _slot_ | undefined | Close button  |
 
 ## Dialog Footer
 
-- Button (primary, secondary, tertiary) order, an issue to be resolved from design.
+The footer is a container for the actions of the dialog, which must be not more than 3.
+
+![Visual anatomy of Dialog component](./assets/dialog-footer.png)
+⚠️ Image subject to change!
+
+```html
+<div class="fui-dialog-footer">
+  <button>{action1}</button>
+  <button>{action2}</button>
+  <button>{action3}</button>
+</div>
+```
+
+⚠️ Should there be this grouping, actionButtons and the tertiary button?
+
+⚠️ _Pending issue: should there be any handling for the order of buttons?_
+
+## Dialog Body
+
+The body is a container where the content of the dialog is rendered. Apart from padding, this component does not have other behaviour.
 
 ## Dialog variations - `type` property
 
-- Modal dialog
+### Modal dialog
 
-  When this type of dialog is open, the rest of the page is dimmed out and cannot be interacted with. The tab sequence is kept within the dialog and moving the focus outside the dialog will imply closing it. This is the default type of the component.
+When this type of dialog is open, the rest of the page is dimmed out and cannot be interacted with. The tab sequence is kept within the dialog and moving the focus outside the dialog will imply closing it. This is the default type of the component.
 
-  `role="dialog"`
+`role="dialog"`
 
-- Non-modal dialog
+### Non-modal dialog
 
-  When a non-modal dialog is open, the rest of the page is not dimmed out and users can interact with the rest of the page. This also implies that the tab focus can move outside the dialog when it reaches the last focusable element.
+When a non-modal dialog is open, the rest of the page is not dimmed out and users can interact with the rest of the page. This also implies that the tab focus can move outside the dialog when it reaches the last focusable element.
 
-  `role="dialog"`
+`role="dialog"`
 
-- Alert dialog
+### Alert dialog
 
-  Alert dialog are a special type of modal dialogs that interrupts the user's workflow to communicate an important message or ask for a decision. These dialogs are not dismissable, neither by escape key or by clicking outside the dialog.
+Alert dialog are a special type of modal dialogs that interrupts the user's workflow to communicate an important message or ask for a decision. These dialogs are not dismissable, neither by escape key or by clicking outside the dialog.
 
-  `role="alertdialog"`
+`role="alertdialog"`
 
-### Sample Code
+## Sample Code
 
 ### Structure
 
 TBA
 
-#### App
+### App
 
 ```tsx
 <Button>Open Dialog</Button>
@@ -146,7 +191,7 @@ TBA
 </Dialog>
 ```
 
-#### DOM structure
+### DOM structure
 
 ```html
 <button>Open Dialog</button>
@@ -164,7 +209,7 @@ TBA
 </div>
 ```
 
-#### useDialogInstance hook
+### useDialogInstance hook
 
 Hook that provides the state management for a dialog.
 
