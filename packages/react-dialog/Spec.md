@@ -98,6 +98,14 @@ In v0, the Dialog component expects all the content through props, including the
 | isDraggable | boolean                       | `false`   | Set to `true` to make the dialog draggable |
 | overlay     | _slot_                        | undefined | Dimmed background of dialog                |
 
+- `type` property (Dialog variations)
+
+  - `modal`: When this type of dialog is open, the rest of the page is dimmed out and cannot be interacted with. The tab sequence is kept within the dialog and moving the focus outside the dialog will imply closing it. This is the default type of the component.
+
+  - `non-modal`: When a non-modal dialog is open, the rest of the page is not dimmed out and users can interact with the rest of the page. This also implies that the tab focus can move outside the dialog when it reaches the last focusable element.
+
+  - `alert`: are a special type of modal dialogs that interrupts the user's workflow to communicate an important message or ask for a decision. These dialogs are not dismissable, neither by escape key or by clicking outside the dialog.
+
 ### DOM
 
 ```html
@@ -150,25 +158,9 @@ The footer is a container for the actions of the dialog, which must be not more 
 
 The body is a container where the content of the dialog is rendered. Apart from padding, this component does not have other behaviour.
 
-## Dialog variations - `type` property
-
-### Modal dialog
-
-When this type of dialog is open, the rest of the page is dimmed out and cannot be interacted with. The tab sequence is kept within the dialog and moving the focus outside the dialog will imply closing it. This is the default type of the component.
-
-`role="dialog"`
-
-### Non-modal dialog
-
-When a non-modal dialog is open, the rest of the page is not dimmed out and users can interact with the rest of the page. This also implies that the tab focus can move outside the dialog when it reaches the last focusable element.
-
-`role="dialog"`
-
-### Alert dialog
-
-Alert dialog are a special type of modal dialogs that interrupts the user's workflow to communicate an important message or ask for a decision. These dialogs are not dismissable, neither by escape key or by clicking outside the dialog.
-
-`role="alertdialog"`
+```html
+<div class="fui-dialog-body">{children}</div>
+```
 
 ## Sample Code
 
@@ -215,27 +207,70 @@ Hook that provides the state management for a dialog.
 
 ## Migration
 
-_Describe what will need to be done to upgrade from the existing implementations:_
+_TBA: Link to migration guide doc_
 
-- _Migration from v8_
-- _Migration from v0_
+## Behaviours
 
-## Behaviors
+### Mouse & touch
 
-TODO:
+#### Modal
 
-- add the modeless dialog behavior
-- add the alert dialog behavior
-- 400% zoom behaviour
+![Visual anatomy of Dialog component](./assets/modal-mouse-touch.png)
 
-  _Explain how the component will behave in use, including:_
+1. Clicking on the trigger (or interaction event that triggers the dialog) a Dialog is displayed with a dimmed background
+2. Depending on the content, the dialog actions (footer) may be disabled until user completes tasks
+3. Clicking on the dimmed background dismisses the dialog
+4. Clicking the dismiss button (X icon in header), or one of the designated cancel/dismiss buttons (footer) will close the dialog
+5. The dialog can be dismissed once the user confirms or completes the task using the confirmation button (footer)
 
-- _Component States_
-- _Interaction_
-  - _Keyboard_
-  - _Cursor_
-  - _Touch_
-  - _Screen readers_
+#### Non-modal
+
+![Visual anatomy of Dialog component](./assets/non-modal-mouse-touch.png)
+
+1. Clicking on the trigger (or interaction event that triggers the dialog) a Dialog is displayed without a dimmed background
+2. A user can continue to interact with elements on the page behind the dialog
+3. Clicking the dismiss button (X icon in header), or one of the designated cancel/dismiss buttons (footer) can dismiss the dialog
+
+#### Alert dialog
+
+![Visual anatomy of Dialog component](./assets/alert-mouse-touch.png)
+
+1. Clicking on the trigger (or interaction event that triggers the dialog) a Dialog is displayed with a dimmed background
+2. A user cannot interact with elements outside of the dialog, clicking on the dimmed background will not close the dialog
+3. Clicking the dismiss button (X icon in header), or the designated cancel/dismiss buttons (footer) can dismiss the dialog
+
+### Keyboard
+
+#### Modal
+
+![Visual anatomy of Dialog component](./assets/modal-keyboard.png)
+
+1. **(1)** TabKey to set focus on Trigger, use EnterKey to open.
+2. **(2-5)** Focus (whose control depends upon the dialogs purpose) should be moved to the default focusable control inside the dialog. For dialogs that only provide a basic message, it could be an "OK" button. For dialogs containing a form it could be the first field in the form.
+3. **(5-6)** After the dialog is dismissed, keyboard focus should be moved back to where it was before it moved into the dialog. Otherwise the focus can be dropped to the beginning of the page. Or if the item is no longer available it can be moved to the next logical location in that region i.e. next / previous item.
+4. **TabKey** Moves focus to next focusable element inside the dialog. When focus is on the last focusable element in the dialog, moves focus to the first focusable element in the dialog.
+5. **Shift+Tab** Moves focus to previous focusable element inside the dialog. When focus is on the first focusable element in the dialog, moves focus to the last focusable element in the dialog.
+6. **EscKey** Closes the dialog.
+
+#### Non-modal
+
+![Visual anatomy of Dialog component](./assets/non-modal-keyboard.png)
+
+1. **(1)** **TabKey** to set focus on Trigger, use EnterKey to open.
+2. - **(2a)** Focus (whose control depends upon the dialogs purpose) should be moved to the default focusable control inside the dialog. For dialogs that only provide a basic message, it could be an "OK" button. For dialogs containing a form it could be the first field in the form.
+   - **(2b)** **EnterKey** on dismiss action to close dialog, After the dialog is dismissed, keyboard focus should be moved back to where it was before it moved into the dialog. Otherwise the focus can be dropped to the beginning of the page.
+3. **TabKey** Moves focus to next focusable element inside the dialog, once you get to the end of the focusable items within the dialog focus moves to next actionable items outside of the dialog container.
+4. **Shift+Tab** Moves focus to previous focusable element inside the dialog and back to the trigger control.
+
+#### Alert dialog
+
+![Visual anatomy of Dialog component](./assets/alert-keyboard.png)
+
+1. **(1)** **TabKey** to set focus on Trigger, use EnterKey to open.
+2. **(2 & 3)** Focus is automatically set to the first focusable element inside the dialog, which is the "No" button. This is the least destructive action, so focusing "No" helps prevent users from accidentally confirming the destructive "Discard" action, which cannot be undone.
+3. **EnterKey** Confirms or cancels the alert message and dialog is dismissed
+4. **TabKey** Moves focus to next focusable element inside the dialog. When focus is on the last focusable element in the dialog, moves focus to the first focusable element in the dialog.
+5. **Shift+Tab** Moves focus to previous focusable element inside the dialog. When focus is on the first focusable element in the dialog, moves focus to the last focusable element in the dialog.
 
 ## Accessibility
 
@@ -244,15 +279,6 @@ useful links:
 - https://www.w3.org/TR/wai-aria-practices/examples/dialog-modal/dialog.html#
 
 Follows the [Dialog WAI-Aria design pattern](https://www.w3.org/TR/wai-aria-practices-1.2/#dialog_modal)
-
-Once the dialog is open, the focus will be trapped within the dialog and the user can either click the overlay to close the dialog or press the escape key to close the dialog. When closed, the focus will be restored to the element that opened the dialog.
-
-Keyboard interaction:
-
-- `Enter`, `Space` - Open/Close the dialog
-- `Tab` - Move focus to first tabbable element in the dialog
-- `Shift + Tab` - Move focus to the previous focusable element in the dialog
-- `Escape` - Closes dialog and focus moves back to the element that opened the dialog
 
 ARIA attributes:
 
