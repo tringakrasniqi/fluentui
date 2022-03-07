@@ -72,6 +72,8 @@ In v0, the Dialog component expects all the content through props, including the
 
 ## API proposal
 
+Dialog component is composed by 3 sub-components: Header, Body and Footer.
+
 ### Components
 
 | Component    | Purpose                                                  |
@@ -83,13 +85,13 @@ In v0, the Dialog component expects all the content through props, including the
 
 ## Dialog
 
+The dialog is a container which handles styling (border, background etc.) and the overlay (dimmed background).
+
 ### Anatomy
 
 ![Visual anatomy of Dialog component](./assets/dialog-anatomy.png)
 
 ### API
-
-[Dialog.types.ts](https://github.com/microsoft/fluentui/blob/master/packages/react-dialog/src/components/Dialog/Dialog.types.ts)
 
 | Property    | Values                        | Default   | Purpose                                    |
 | ----------- | ----------------------------- | --------- | ------------------------------------------ |
@@ -98,7 +100,7 @@ In v0, the Dialog component expects all the content through props, including the
 | isDraggable | boolean                       | `false`   | Set to `true` to make the dialog draggable |
 | overlay     | _slot_                        | undefined | Dimmed background of dialog                |
 
-- `type` property (Dialog variations)
+- `type` property (dialog variations):
 
   - `modal`: When this type of dialog is open, the rest of the page is dimmed out and cannot be interacted with. The tab sequence is kept within the dialog and moving the focus outside the dialog will imply closing it. This is the default type of the component.
 
@@ -114,9 +116,11 @@ In v0, the Dialog component expects all the content through props, including the
 
 ## Dialog Header
 
+The Header component will expect to have a dialog title/header and will show by default the close (X icon) button.
+
 ### Anatomy
 
-![Visual anatomy of Dialog component](./assets/dialog-header.png)
+![Visual anatomy of DialogHeader sub-component](./assets/dialog-header.png)
 ⚠️ Image subject to change!
 
 ### DOM
@@ -130,29 +134,10 @@ In v0, the Dialog component expects all the content through props, including the
 
 ### API
 
-| Property    | Values | Default   | Purpose       |
-| ----------- | ------ | --------- | ------------- |
-| header      | _slot_ | undefined | Dialog header |
-| closeButton | _slot_ | undefined | Close button  |
-
-## Dialog Footer
-
-The footer is a container for the actions of the dialog, which must be not more than 3.
-
-![Visual anatomy of Dialog component](./assets/dialog-footer.png)
-⚠️ Image subject to change!
-
-```html
-<div class="fui-dialog-footer">
-  <button>{action1}</button>
-  <button>{action2}</button>
-  <button>{action3}</button>
-</div>
-```
-
-⚠️ Should there be this grouping, actionButtons and the tertiary button?
-
-⚠️ _Pending issue: should there be any handling for the order of buttons?_
+| Property          | Values  | Default     | Purpose                         |
+| ----------------- | ------- | ----------- | ------------------------------- |
+| `closeButton`     | _slot_  | `undefined` | Button that closes the dialog   |
+| `hideCloseButton` | boolean | `false`     | Shows or hides the close button |
 
 ## Dialog Body
 
@@ -162,23 +147,42 @@ The body is a container where the content of the dialog is rendered. Apart from 
 <div class="fui-dialog-body">{children}</div>
 ```
 
+## Dialog Footer
+
+The footer is a container for the actions of the dialog, which must be not more than 3 (primary, secondary and tertiary actions).
+
+### Anatomy
+
+![Visual anatomy of DialogFooter sub-component](./assets/dialog-footer.png)
+⚠️ Image subject to change!
+
+### DOM
+
+```html
+<div class="fui-dialog-footer">
+  <button>{tertiaryAction}</button>
+  <button>{primaryAction}</button>
+  <button>{secondaryAction}</button>
+</div>
+```
+
+> ⚠️ _Pending issue: should there be any handling for the order of buttons?_
+
 ## Sample Code
-
-### Structure
-
-TBA
 
 ### App
 
 ```tsx
-<Button>Open Dialog</Button>
+<Button onClick={() => setIsOpen(true)} aria-haspopup={true}>
+  Open Dialog
+</Button>
 
-<Dialog>
-  <DialogHeader>Missing Subject</DialogHeader>
-  <DialogBody>Do you want to send this message without a subject?</DialogBody>
+<Dialog isOpen={isOpen}>
+  <DialogHeader>Dialog title</DialogHeader>
+  <DialogBody>Dialog's main content</DialogBody>
   <DialogFooter>
-    <Button>Send</Button>
-    <Button>Cancel<Button>
+    <Button>Submit</Button>
+    <Button>Cancel</Button>
   </DialogFooter>
 </Dialog>
 ```
@@ -189,7 +193,7 @@ TBA
 <button>Open Dialog</button>
 <!-- Something something something -->
 <div class="fui-portal">
-  <div class="fui-dialog">
+  <div role="dialog" class="fui-dialog">
     <div class="fui-dialog-overlay" />
     <header class="fui-dialog-header">Missing Subject</header>
     <div class="fui-dialog-body">Do you want to send this message without a subject?</div>
@@ -201,10 +205,6 @@ TBA
 </div>
 ```
 
-### useDialogInstance hook
-
-Hook that provides the state management for a dialog.
-
 ## Migration
 
 _TBA: Link to migration guide doc_
@@ -215,38 +215,38 @@ _TBA: Link to migration guide doc_
 
 #### Modal
 
-![Visual anatomy of Dialog component](./assets/modal-mouse-touch.png)
+![Mouse and touch behaviour of Modal dialog](./assets/modal-mouse-touch.png)
 
-1. Clicking on the trigger (or interaction event that triggers the dialog) a Dialog is displayed with a dimmed background
-2. Depending on the content, the dialog actions (footer) may be disabled until user completes tasks
-3. Clicking on the dimmed background dismisses the dialog
-4. Clicking the dismiss button (X icon in header), or one of the designated cancel/dismiss buttons (footer) will close the dialog
-5. The dialog can be dismissed once the user confirms or completes the task using the confirmation button (footer)
+1. Clicking on the trigger (element / button component) a Dialog is displayed with a dimmed background.
+2. Windows under the dialog are inert.
+3. Clicking on the dimmed background dismisses the dialog.
+4. Clicking the dismiss button (X icon in header), or cancel/dismiss button (footer) will close the dialog.
+5. The dialog can be dismissed also when confirmation button is clicked (footer).
 
 #### Non-modal
 
-![Visual anatomy of Dialog component](./assets/non-modal-mouse-touch.png)
+![Mouse and touch behaviour of a non-modal dialog](./assets/non-modal-mouse-touch.png)
 
-1. Clicking on the trigger (or interaction event that triggers the dialog) a Dialog is displayed without a dimmed background
+1. Clicking on the trigger (element / button component) a Dialog is displayed without a dimmed background
 2. A user can continue to interact with elements on the page behind the dialog
-3. Clicking the dismiss button (X icon in header), or one of the designated cancel/dismiss buttons (footer) can dismiss the dialog
+3. Clicking the dismiss button (X icon in header), or cancel/dismiss buttons (footer) will close the dialog
 
 #### Alert dialog
 
-![Visual anatomy of Dialog component](./assets/alert-mouse-touch.png)
+![Mouse and touch behaviour of alert dialog](./assets/alert-mouse-touch.png)
 
-1. Clicking on the trigger (or interaction event that triggers the dialog) a Dialog is displayed with a dimmed background
-2. A user cannot interact with elements outside of the dialog, clicking on the dimmed background will not close the dialog
-3. Clicking the dismiss button (X icon in header), or the designated cancel/dismiss buttons (footer) can dismiss the dialog
+1. Clicking on the trigger (element / button component) a Dialog is displayed with a dimmed background
+2. Widnows under the dialog are are inert and clicking on the dimmed background will not close the dialog
+3. Clicking the dismiss button (X icon in header), or cancel/dismiss buttons (footer) will dismiss the dialog
 
 ### Keyboard
 
 #### Modal
 
-![Visual anatomy of Dialog component](./assets/modal-keyboard.png)
+![Keyboard behaviour of a modal dialog](./assets/modal-keyboard.png)
 
 1. **(1)** TabKey to set focus on Trigger, use EnterKey to open.
-2. **(2-5)** Focus (whose control depends upon the dialogs purpose) should be moved to the default focusable control inside the dialog. For dialogs that only provide a basic message, it could be an "OK" button. For dialogs containing a form it could be the first field in the form.
+2. **(2-5)** Focus is moved to the first focusable control inside the dialog.
 3. **(5-6)** After the dialog is dismissed, keyboard focus should be moved back to where it was before it moved into the dialog. Otherwise the focus can be dropped to the beginning of the page. Or if the item is no longer available it can be moved to the next logical location in that region i.e. next / previous item.
 4. **TabKey** Moves focus to next focusable element inside the dialog. When focus is on the last focusable element in the dialog, moves focus to the first focusable element in the dialog.
 5. **Shift+Tab** Moves focus to previous focusable element inside the dialog. When focus is on the first focusable element in the dialog, moves focus to the last focusable element in the dialog.
@@ -254,44 +254,60 @@ _TBA: Link to migration guide doc_
 
 #### Non-modal
 
-![Visual anatomy of Dialog component](./assets/non-modal-keyboard.png)
+![Keyboard behaviour of non-modal dialog](./assets/non-modal-keyboard.png)
 
-1. **(1)** **TabKey** to set focus on Trigger, use EnterKey to open.
-2. - **(2a)** Focus (whose control depends upon the dialogs purpose) should be moved to the default focusable control inside the dialog. For dialogs that only provide a basic message, it could be an "OK" button. For dialogs containing a form it could be the first field in the form.
-   - **(2b)** **EnterKey** on dismiss action to close dialog, After the dialog is dismissed, keyboard focus should be moved back to where it was before it moved into the dialog. Otherwise the focus can be dropped to the beginning of the page.
-3. **TabKey** Moves focus to next focusable element inside the dialog, once you get to the end of the focusable items within the dialog focus moves to next actionable items outside of the dialog container.
-4. **Shift+Tab** Moves focus to previous focusable element inside the dialog and back to the trigger control.
+1. **(1)** **TabKey** to set focus on Trigger, use **EnterKey** to open.
+2. - **(2a)** Focus is moved to the default focusable control inside the dialog.
+   - **(2b)** **EnterKey** on dismiss action to close dialog,
+3. After the dialog is dismissed, keyboard focus should be moved back to where it was before it moved into the dialog. Otherwise the focus can be dropped to the beginning of the page.
+4. **TabKey** Moves focus to next focusable element inside the dialog, once you get to the end of the focusable items within the dialog focus moves to next actionable item outside of the dialog container.
+5. **Shift+Tab** Moves focus to previous focusable element inside the dialog and back to the trigger control.
 
 #### Alert dialog
 
-![Visual anatomy of Dialog component](./assets/alert-keyboard.png)
+![Keybaord behaviour of alert dialog](./assets/alert-keyboard.png)
 
-1. **(1)** **TabKey** to set focus on Trigger, use EnterKey to open.
+1. **(1)** **TabKey** to set focus on Trigger, use **EnterKey** to open.
 2. **(2 & 3)** Focus is automatically set to the first focusable element inside the dialog, which is the "No" button. This is the least destructive action, so focusing "No" helps prevent users from accidentally confirming the destructive "Discard" action, which cannot be undone.
-3. **EnterKey** Confirms or cancels the alert message and dialog is dismissed
+3. **EnterKey** Confirms or cancels the alert message and dialog is dismissed.
 4. **TabKey** Moves focus to next focusable element inside the dialog. When focus is on the last focusable element in the dialog, moves focus to the first focusable element in the dialog.
 5. **Shift+Tab** Moves focus to previous focusable element inside the dialog. When focus is on the first focusable element in the dialog, moves focus to the last focusable element in the dialog.
 
 ## Accessibility
 
-useful links:
+> ⚠️ _Note: All other accessibility information, not covered in this section, is provided throughout the spec._
 
-- https://www.w3.org/TR/wai-aria-practices/examples/dialog-modal/dialog.html#
+The dialog component follows the [Dialog WAI-Aria design pattern](https://www.w3.org/TR/wai-aria-practices-1.2/#dialog_modal).
 
-Follows the [Dialog WAI-Aria design pattern](https://www.w3.org/TR/wai-aria-practices-1.2/#dialog_modal)
+### Aria roles and states
 
-ARIA attributes:
+#### Modal
 
-- `role` - `dialog`, `alertdialog`
+[`role="alertdialog"` documentation](https://www.w3.org/TR/wai-aria-1.1/#dialog)
 
-Base accessibility information is included in the design document. After the spec is filled and review, outcomes from it need to be communicated to design and incorporated in the design document.
+- Trigger button
+  - `aria-haspopup="dialog"`
+- Dialog
+  - Role: `role="dialog"`
+  - Stat: `aria-modal=true`
+  - Text: `aria-labelledby={dialog-title}` or `aria-label={dialog-title}`
 
-- Decide whether to use **native element** or folow **ARIA** and provide reasons
-- Identify the **[ARIA](https://www.w3.org/TR/wai-aria-practices-1.2/) pattern** and, if the component is listed there, follow its specification as possible.
-- Identify accessibility **variants**, the `role` ([ARIA roles](https://www.w3.org/TR/wai-aria-1.1/#role_definitions)) of the component, its `slots` and `aria-*` props.
-- Describe the **keyboard navigation**: Tab Oder and Arrow Key Navigation. Describe any other keyboard **shortcuts** used
-- Specify texts for **state change announcements** - [ARIA live regions
-  ](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Live_Regions) (number of available items in dropdown, error messages, confirmations, ...)
-- Identify UI parts that appear on **hover or focus** and specify keyboard and screen reader interaction with them
-- List cases when **focus** needs to be **trapped** in sections of the UI (for dialogs and popups or for hierarchical navigation)
-- List cases when **focus** needs to be **moved programatically** (if parts of the UI are appearing/disappearing or other cases)
+#### Non-modal
+
+- Trigger button
+  - `aria-haspopup="dialog"`
+- Dialog
+  - Role: `role="dialog"`
+  - State: `aria-expanded="modal"`
+  - Text: `aria-labelledby={dialog-title}` or `aria-label={dialog-title}`
+
+#### Alert dialog
+
+[`role="alertdialog"` documentation](https://www.w3.org/TR/wai-aria-1.1/#alertdialog)
+
+- Trigger button
+  - `aria-haspopup="dialog"`
+- Dialog
+  - Role: `role="alertdialog"`
+  - State: `aria-modal=true`
+  - Text: `aria-labelledby={dialog-title}` or `aria-label={dialog-title}`
